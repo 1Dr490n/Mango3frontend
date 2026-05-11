@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	--bg: #000000;
+	--fg: #262626;
+	--light-bg: #171717;
+	--text: #ffffff;
+	--light-text: #828282;
+	--sender-text: #60a5fa;
+	--checked: #404040;
+	--save-bg: #15803d;
+	--link: #2997ca;
+}
+
+a {
+	color: var(--link);
+}
