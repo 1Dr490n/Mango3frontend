@@ -80,6 +80,7 @@ export const isApiError = (response: any) => {
 };
 
 const checkUnauthorized = (res: Response, url?: URL | string) => {
+	console.log(res.status);
 	if (res.status === 401) {
 		const redirectUrl = `/login/?redirect=${url || ''}`;
 		if (browser) {
