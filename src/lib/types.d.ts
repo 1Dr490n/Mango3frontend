@@ -18,9 +18,10 @@ export class Theme {
 export class GroupDTO {
 	id: string;
 	name: string | null;
-	users: UserDTO[];
 	new_activity: boolean;
 	picture: string;
+	message_count: number;
+	is_private: boolean;
 }
 
 export class UserDTO {
@@ -55,6 +56,11 @@ export class MessageDTO {
 	is_new: boolean;
 
 	item: ItemDTO;
+}
+
+export class AuthDTO {
+	username: string;
+	password: string;
 }
 
 type ResData<T> = {

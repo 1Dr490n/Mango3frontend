@@ -1,15 +1,49 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import Error from '../lib/components/Error.svelte';
+	import { onMount } from 'svelte';
 	import Group from '../lib/components/Group.svelte';
+	import Loader from '../lib/components/Loader.svelte';
 	import TopBar from '../lib/components/TopBar.svelte';
 	import Tutorial from '../lib/components/Tutorial.svelte';
-	import type { GroupDTO } from '../lib/types';
+	import type { GroupDTO, ResData } from '../lib/types';
+	import { API } from '../lib/api';
+	import Error from '../lib/components/Error.svelte';
 
 	export let data;
 
-	let groups: GroupDTO[] | undefined;
-	$: groups = data.data;
+	let groups: (GroupDTO | undefined)[] | undefined = undefined;
+
+	let loaded = 0;
+	let error: string | undefined;
+
+	onMount(async () => {
+		const count: ResData<{ count: number }> = await API.get({
+			resource: `/group/count`,
+			auth: data.auth,
+			url: data.url
+		});
+		if (!count.data) {
+			error = count.error;
+			return;
+		}
+		groups = Array(count.data.count);
+		for (let i = 0; i < count.data.count; i += 1) {
+			const promise = API.get({
+				resource: `/group?take=1&skip=${i}`,
+				auth: data.auth,
+				url: data.url
+			});
+
+			promise.then((x) => {
+				loaded++;
+				if (x.error) {
+					error = x.error;
+					return;
+				}
+				groups[i] = x.data[0];
+			});
+		}
+	});
 </script>
 
 <TopBar>
@@ -35,19 +69,21 @@
 		</button>
 	</div>
 </TopBar>
-<Error error={data.error} />
-{#if groups}
-	{#each groups as group}
+{#each groups || [] as group}
+	{#if group}
 		<Group
 			{group}
-			username={data.username}
 			onclick={() => {
 				goto(`group/${group.id}`);
 			}}
 			showNewActivity
 		/>
-	{/each}
+	{/if}
+{/each}
+{#if !groups || loaded < groups.length}
+	<Loader />
 {/if}
+<Error {error} />
 
 <div class="mt-5">
 	<Tutorial title="Welcome!" expanded>

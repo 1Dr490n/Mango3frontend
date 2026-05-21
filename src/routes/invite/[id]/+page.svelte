@@ -5,7 +5,6 @@
 	import User from '../../../lib/components/User.svelte';
 	import type { InviteDTO } from '../../../lib/types';
 	import { enhance } from '$app/forms';
-	import Tutorial from '../../../lib/components/Tutorial.svelte';
 
 	export let data;
 	let invite: InviteDTO | undefined;
@@ -20,16 +19,16 @@
 		{invite.group?.name ?? 'Private chat'}
 	</div>
 	<div class="flex justify-center text-sm">
-		{invite.sent_by.display_name || invite.sent_by.username} invited you!
+		{invite.sent_by.display_name} invited you!
 	</div>
 	<div class="flex justify-center text-sm">
 		{new Date(invite.sent_at).toLocaleDateString()}
 		{new Date(invite.sent_at).toLocaleTimeString()}
 	</div>
 
-	{#each invite.group?.users ?? [invite.sent_by] as member}
+	<!--{#each invite.group?.users ?? [invite.sent_by] as member}
 		<User user={member} />
-	{/each}
+	{/each}-->
 
 	<div class="flex justify-center">
 		<form class="w-1/2" method="post" use:enhance>

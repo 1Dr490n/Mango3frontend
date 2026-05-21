@@ -21,27 +21,21 @@ export const actions: Actions = {
 		const displayName = form.get('displayname')?.toString() || '';
 		const bio = form.get('bio')?.toString() || '';
 
-		const response = await API.put(
-			{
-				resource: '/user',
-				data: { display_name: displayName, bio, profile_pic: true },
-				auth: true,
-				url
-			},
+		const response = await API.put({
+			resource: '/user',
+			data: { display_name: displayName, bio, profile_pic: true },
+			url,
 			cookies
-		);
+		});
 
 		return response;
 	},
 	message: async ({ cookies, params, url }) => {
-		const group: ResData<GroupDTO> = await API.get(
-			{
-				resource: `/group/user/${params.id}`,
-				auth: true,
-				url
-			},
+		const group: ResData<GroupDTO> = await API.get({
+			resource: `/group/user/${params.id}`,
+			url,
 			cookies
-		);
+		});
 		if (group.error) {
 			return group;
 		}

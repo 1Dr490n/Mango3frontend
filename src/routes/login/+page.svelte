@@ -20,7 +20,6 @@
 
 	let redirect: string;
 	if (browser && location) {
-		console.log(new URLSearchParams(location.search).entries().toArray());
 		redirect = (browser && location && new URLSearchParams(location.search).get('redirect')) || '/';
 	}
 </script>

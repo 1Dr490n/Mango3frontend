@@ -17,5 +17,5 @@
 		src={user.profile_pic || '/icon.png'}
 		class="m-1 aspect-square min-w-14 w-14 rounded-full object-cover"
 	/>
-	<p class="text-md ml-2">{user.display_name || user.username}</p>
+	<p class="text-md ml-2">{user.display_name}</p>
 </div>

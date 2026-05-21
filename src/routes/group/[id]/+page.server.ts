@@ -1,50 +1,73 @@
-import { API } from '../../../lib/api';
-import type { GroupDTO, InviteDTO, ItemDTO, MessageDTO, ResData } from '../../../lib/types';
-import type { PageServerLoad } from '../../$types';
+import { API, auth } from '../../../lib/api';
+import type {
+	GroupDTO,
+	InviteDTO,
+	ItemDTO,
+	MessageDTO,
+	ResData,
+	UserDTO
+} from '../../../lib/types';
 import { fail, redirect } from '@sveltejs/kit';
-import type { Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ cookies, params, url }) => {
+	return { auth: auth(cookies), params, url: url.href };
+};
+
+/*export const load: PageServerLoad = async ({ cookies, params, url }) => {
 	let response: {
-		group?: GroupDTO | undefined;
-		messages?: MessageDTO[] | undefined;
-		error?: string | undefined;
-		status?: number;
-		username?: string | undefined;
+		initial?: Promise<{
+			group: ResData<GroupDTO>;
+			messages: Promise<ResData<MessageDTO[]>>[];
+			username: string | undefined;
+		}>;
+		users?: Promise<ResData<UserDTO[]>>;
 	} = {};
 
-	const group: ResData<GroupDTO> = await API.get(
-		{
-			resource: `/group/${params.id}`,
-			auth: true,
-			url
-		},
-		cookies
-	);
+	response.initial = new Promise<{
+		group: ResData<GroupDTO>;
+		messages: Promise<ResData<MessageDTO[]>>[];
+		username: string | undefined;
+	}>(async (resolve) => {
+		const group: ResData<GroupDTO> = await API.get(
+			{
+				resource: `/group/${params.id}`,
+				auth: true,
+				url
+			},
+			cookies
+		);
 
-	if (!group.data || group.error) {
-		response = { ...response, ...group };
-		return response;
-	}
+		const messages: Promise<ResData<MessageDTO[]>>[] = [];
+		if (group.data) {
+			for (let i = 0; i < group.data.message_count; i += 5) {
+				messages.push(
+					API.get(
+						{
+							resource: `/group/${params.id}/message?take=5&skip=${i}`,
+							auth: true,
+							url
+						},
+						cookies
+					)
+				);
+			}
+		}
 
-	response.group = group.data;
-	response.username = group.username;
+		resolve({
+			group,
+			messages,
+			username: group.username
+		});
+	});
 
-	const messages: ResData<MessageDTO[]> = await API.get(
-		{
-			resource: `/group/${params.id}/message`,
-			auth: true,
-			url
-		},
-		cookies
-	);
-	response.messages = messages.data;
-
-	response.error = group.error || messages.error;
-	response.status = messages.status;
+	response.users = API.get({
+		resource: `/group/${params.id}/users`,
+		url
+	});
 
 	return response;
-};
+};*/
 export const actions: Actions = {
 	search: async ({ request, url }) => {
 		const form = await request.formData();
@@ -73,18 +96,15 @@ export const actions: Actions = {
 		const message = form?.get('message')?.toString() || '';
 		const item = form?.get('item')?.toString();
 
-		const response = await API.post(
-			{
-				resource: `/group/${params.id}/message`,
-				auth: true,
-				data: {
-					item: item && JSON.parse(item),
-					message
-				},
-				url
+		const response = await API.post({
+			resource: `/group/${params.id}/message`,
+			data: {
+				item: item && JSON.parse(item),
+				message
 			},
+			url,
 			cookies
-		);
+		});
 
 		if (response.error) {
 			return fail(400, { error: response.error, message, item });
@@ -97,31 +117,25 @@ export const actions: Actions = {
 
 		const messageId = +(form.get('message') || 0);
 
-		const response = await API.delete(
-			{
-				resource: `/group/${params.id}/message/${messageId}`,
-				auth: true,
-				url
-			},
-			cookies
-		);
+		const response = await API.delete({
+			resource: `/group/${params.id}/message/${messageId}`,
+			cookies,
+			url
+		});
 
 		if (response.error) {
 			return fail(400, { error: response.error });
 		}
 	},
 	invite: async ({ cookies, params, url }) => {
-		const response: ResData<InviteDTO> = await API.post(
-			{
-				resource: `/group/${params.id}/invite`,
-				auth: true,
-				data: {
-					limit: 10
-				},
-				url
+		const response: ResData<InviteDTO> = await API.post({
+			resource: `/group/${params.id}/invite`,
+			data: {
+				limit: 10
 			},
+			url,
 			cookies
-		);
+		});
 
 		if (response.error) {
 			return fail(400, { error: response.error });
