@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { API } from '../../../lib/api';
 	import Button from '../../../lib/components/Button.svelte';
 	import Error from '../../../lib/components/Error.svelte';
 	import Input from '../../../lib/components/Input.svelte';
@@ -150,7 +149,7 @@
 				text="Save"
 				color="bg-confirm"
 				onclick={async () => {
-					const response = await API.post({
+					/*const response = await API.post({
 						resource: `/user/${data.username}/upload`,
 						data: {
 							data: image || ''
@@ -159,9 +158,9 @@
 					});
 					if (response.error) {
 						data.error = response.error;
-					} else {
-						formElement.submit();
-					}
+					} else {*/
+					formElement.submit();
+					//}
 				}}
 			/>
 		</form>

@@ -2,7 +2,7 @@ import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { redirect, type Cookies } from '@sveltejs/kit';
 import type { AuthDTO, ResData } from './types';
-import { PUBLIC_API_URL } from '$env/static/public';
+import { API_URL } from '$env/static/private';
 
 interface ApiParams {
 	resource: string;
@@ -13,7 +13,7 @@ interface ApiParams {
 	cookies?: Cookies;
 }
 
-export const api_url = PUBLIC_API_URL;
+export const api_url = API_URL;
 
 export function auth(cookies: Cookies): AuthDTO | undefined {
 	const authStr = cookies.get('auth');

@@ -11,55 +11,39 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ cookies, params, url }) => {
-	return { auth: auth(cookies), params, url: url.href };
-};
-
-/*export const load: PageServerLoad = async ({ cookies, params, url }) => {
 	let response: {
 		initial?: Promise<{
 			group: ResData<GroupDTO>;
 			messages: Promise<ResData<MessageDTO[]>>[];
-			username: string | undefined;
 		}>;
 		users?: Promise<ResData<UserDTO[]>>;
 	} = {};
 
-	response.initial = new Promise<{
-		group: ResData<GroupDTO>;
-		messages: Promise<ResData<MessageDTO[]>>[];
-		username: string | undefined;
-	}>(async (resolve) => {
-		const group: ResData<GroupDTO> = await API.get(
-			{
-				resource: `/group/${params.id}`,
-				auth: true,
-				url
-			},
+	response.initial = (async (resolve) => {
+		const group: ResData<GroupDTO> = await API.get({
+			resource: `/group/${params.id}`,
+			url,
 			cookies
-		);
+		});
 
 		const messages: Promise<ResData<MessageDTO[]>>[] = [];
 		if (group.data) {
-			for (let i = 0; i < group.data.message_count; i += 5) {
+			for (let i = 0; i < group.data.message_count; i += 1) {
 				messages.push(
-					API.get(
-						{
-							resource: `/group/${params.id}/message?take=5&skip=${i}`,
-							auth: true,
-							url
-						},
+					API.get({
+						resource: `/group/${params.id}/message?take=1&skip=${i}`,
+						url,
 						cookies
-					)
+					})
 				);
 			}
 		}
 
-		resolve({
+		return {
 			group,
-			messages,
-			username: group.username
-		});
-	});
+			messages
+		};
+	})();
 
 	response.users = API.get({
 		resource: `/group/${params.id}/users`,
@@ -67,7 +51,7 @@ export const load: PageServerLoad = async ({ cookies, params, url }) => {
 	});
 
 	return response;
-};*/
+};
 export const actions: Actions = {
 	search: async ({ request, url }) => {
 		const form = await request.formData();

@@ -11,8 +11,6 @@
 	import Tutorial from '../../../lib/components/Tutorial.svelte';
 	import { browser } from '$app/environment';
 	import Loader from '../../../lib/components/Loader.svelte';
-	import { onMount } from 'svelte';
-	import { API } from '../../../lib/api';
 
 	export let data;
 	export let form;
@@ -22,43 +20,23 @@
 
 	let group: GroupDTO | undefined = undefined;
 	let error: string = '';
-	let messages: (MessageDTO | (undefined & { sentBy: UserDTO | undefined }))[] = [];
+	let messages: (MessageDTO | undefined)[] = [];
 
-	onMount(async () => {
-		try {
-			const groupRes: ResData<GroupDTO> = await API.get({
-				resource: `/group/${data.params.id}`,
-				auth: data.auth,
-				url: data.url
+	data.initial?.then((initial) => {
+		if (!initial.group.data) {
+			error = initial.group.error || '';
+			return;
+		}
+		group = initial.group.data;
+		messages = Array(group.message_count);
+
+		for (let i = 0; i < messages.length; i++) {
+			initial.messages[i].then((message) => {
+				if (message.data) {
+					messages[i] = message.data[0];
+				}
+				loaded++;
 			});
-
-			if (!groupRes.data) {
-				error = groupRes.error || '';
-				return;
-			}
-			group = groupRes.data;
-			messages = Array(group.message_count);
-
-			for (let i = 0; i < group.message_count; i += 1) {
-				const promise: Promise<ResData<MessageDTO[]>> = API.get({
-					resource: `/group/${data.params.id}/message?take=1&skip=${i}`,
-					auth: data.auth,
-					url: data.url
-				});
-				promise.then((res) => {
-					loaded++;
-					if (res.data) {
-						messages[i] = res.data[0];
-					}
-				});
-			}
-
-			/*response.users = API.get({
-			resource: `/group/${params.id}/users`,
-			url
-		});*/
-		} catch (e) {
-			console.error(e);
 		}
 	});
 
@@ -74,14 +52,14 @@
 
 	let loaded = 0;
 
-	/*if (data.users) {
+	if (data.users) {
 		data.users.then((x) => {
 			users = new Map();
 			for (const user of x.data || []) {
 				users.set(user.username, user);
 			}
 		});
-	}*/
+	}
 
 	let items: ItemDTO[] = [];
 	let page = 0;
