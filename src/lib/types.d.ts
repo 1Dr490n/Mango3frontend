@@ -68,4 +68,5 @@ type ResData<T> = {
 	error?: string | undefined;
 	status: number;
 	username?: string | undefined;
+	redirect?: string | undefined;
 };

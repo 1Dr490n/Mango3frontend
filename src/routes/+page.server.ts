@@ -1,4 +1,4 @@
-import { API, auth } from '../lib/api';
+import { API } from '../lib/api';
 import type { GroupDTO, ResData } from '../lib/types';
 import type { PageServerLoad } from './invite/$types';
 
@@ -32,7 +32,7 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	};*/
 
 	const response: Promise<{
-		count: number;
+		count: ResData<{ count: number }>;
 		groups: Promise<ResData<GroupDTO[]>>[];
 		error: string | undefined;
 	}> = (async () => {
@@ -54,8 +54,7 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 			}
 		}
 		return {
-			count: count.data?.count ?? 0,
-			error: count.error,
+			count: count,
 			groups
 		};
 	})();

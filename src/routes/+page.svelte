@@ -9,8 +9,11 @@
 	export let data;
 
 	let loaded = 0;
-	data.response.then((x) => {
-		for (const group of x.groups) {
+	data.response.then((response) => {
+		if (response.count.redirect) {
+			goto(response.count.redirect);
+		}
+		for (const group of response.groups) {
 			group.then(() => {
 				loaded++;
 			});
@@ -93,10 +96,10 @@
 			{/if}
 		{/await}
 	{/each}
-	{#if loaded < awaited.count}
+	{#if loaded < awaited.count.count}
 		<Loader />
 	{/if}
-	<Error error={awaited.error} />
+	<Error error={awaited.count.error} />
 {/await}
 
 <div class="mt-5">
