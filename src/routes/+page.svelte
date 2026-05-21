@@ -1,17 +1,23 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
 	import Group from '../lib/components/Group.svelte';
 	import Loader from '../lib/components/Loader.svelte';
 	import TopBar from '../lib/components/TopBar.svelte';
 	import Tutorial from '../lib/components/Tutorial.svelte';
-	import type { GroupDTO, ResData } from '../lib/types';
-	import { API } from '../lib/api';
 	import Error from '../lib/components/Error.svelte';
 
 	export let data;
 
-	let groups: (GroupDTO | undefined)[] | undefined = undefined;
+	let loaded = 0;
+	data.response.then((x) => {
+		for (const group of x.groups) {
+			group.then(() => {
+				loaded++;
+			});
+		}
+	});
+
+	/*let groups: (GroupDTO | undefined)[] | undefined = undefined;
 
 	let loaded = 0;
 	let error: string | undefined;
@@ -43,7 +49,7 @@
 				groups[i] = x.data[0];
 			});
 		}
-	});
+	});*/
 </script>
 
 <TopBar>
@@ -69,21 +75,29 @@
 		</button>
 	</div>
 </TopBar>
-{#each groups || [] as group}
-	{#if group}
-		<Group
-			{group}
-			onclick={() => {
-				goto(`group/${group.id}`);
-			}}
-			showNewActivity
-		/>
-	{/if}
-{/each}
-{#if !groups || loaded < groups.length}
+{#await data.response}
 	<Loader />
-{/if}
-<Error {error} />
+{:then awaited}
+	{#each awaited.groups || [] as groupsPromise}
+		{#await groupsPromise then groups}
+			{#if groups.data}
+				{#each groups.data as group}
+					<Group
+						{group}
+						onclick={() => {
+							goto(`group/${group.id}`);
+						}}
+						showNewActivity
+					/>
+				{/each}
+			{/if}
+		{/await}
+	{/each}
+	{#if loaded < awaited.count}
+		<Loader />
+	{/if}
+	<Error error={awaited.error} />
+{/await}
 
 <div class="mt-5">
 	<Tutorial title="Welcome!" expanded>
