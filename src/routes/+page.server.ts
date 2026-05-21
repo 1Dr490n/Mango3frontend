@@ -34,7 +34,6 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	const response: Promise<{
 		count: ResData<{ count: number }>;
 		groups: Promise<ResData<GroupDTO[]>>[];
-		error: string | undefined;
 	}> = (async () => {
 		const count: ResData<{ count: number }> = await API.get({
 			resource: `/group/count`,

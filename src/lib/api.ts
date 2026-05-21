@@ -34,7 +34,12 @@ async function request(method: string, params: ApiParams): Promise<ResData<any>>
 			body: params.data && JSON.stringify(params.data)
 		});
 
-		if (params.auth || params.cookies) checkUnauthorized(res, params.url || undefined);
+		if (params.auth || params.cookies) {
+			const err = checkUnauthorized(res, params.url || undefined);
+			if (err) {
+				return { ...err, status: 401 };
+			}
+		}
 		if (res.status == 500) {
 			return { error: 'Internal server error', status: 500 };
 		}
@@ -87,7 +92,7 @@ const checkUnauthorized = (res: Response, url?: URL | string) => {
 		} else {
 			return {
 				redirect: redirectUrl,
-				error: 'Invalid credentials'
+				error: 'Redirecting...'
 			};
 		}
 	}

@@ -5,13 +5,14 @@
 	import TopBar from '../lib/components/TopBar.svelte';
 	import Tutorial from '../lib/components/Tutorial.svelte';
 	import Error from '../lib/components/Error.svelte';
+	import { browser } from '$app/environment';
 
 	export let data;
 
 	let loaded = 0;
 	data.response.then((response) => {
 		if (response.count.redirect) {
-			goto(response.count.redirect);
+			if (browser) goto(response.count.redirect);
 		}
 		for (const group of response.groups) {
 			group.then(() => {
@@ -96,7 +97,7 @@
 			{/if}
 		{/await}
 	{/each}
-	{#if loaded < awaited.count.count}
+	{#if loaded < (awaited.count.data?.count || 0)}
 		<Loader />
 	{/if}
 	<Error error={awaited.count.error} />
