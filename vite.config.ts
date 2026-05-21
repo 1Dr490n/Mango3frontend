@@ -9,6 +9,7 @@ export default defineConfig({
 			key: fs.readFileSync(`/etc/letsencrypt/live/mango.thein.nl/privkey.pem`),
 			cert: fs.readFileSync(`/etc/letsencrypt/live/mango.thein.nl/cert.pem`)
 		},
-		proxy: {}
+		proxy: {},
+		port: 443
 	}
 });
