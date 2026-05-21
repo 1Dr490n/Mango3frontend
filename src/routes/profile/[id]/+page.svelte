@@ -12,8 +12,22 @@
 	let edit = false;
 
 	let fileInput: HTMLInputElement | undefined = undefined;
-	let image = data.data?.profile_pic;
+	let image: string | undefined = undefined;
 	let formElement: HTMLFormElement;
+	let userData: { username: string; displayName: string; bio: string } | undefined = undefined;
+	let username = '';
+	let error = '';
+
+	data.user.then((user) => {
+		userData = {
+			username: user.data?.username ?? '',
+			displayName: user.data?.display_name ?? '',
+			bio: user.data?.bio ?? ''
+		};
+		username = user.username ?? '';
+		error = user.error ?? '';
+		if (!image) image = user.data?.profile_pic;
+	});
 
 	let messageForm: HTMLFormElement;
 
@@ -57,7 +71,7 @@
 		<button
 			class="active:bg-fg flex justify-center items-center p-3 ml-1 rounded-full transition-colors aspect-square"
 			on:click={() => {
-				if (data.data?.username === data.username) {
+				if (username === userData?.username) {
 					edit = !edit;
 				} else {
 					messageForm.submit();
@@ -72,7 +86,7 @@
 				stroke="currentColor"
 				class="size-6"
 			>
-				{#if data.data && data.data?.username === data.username}
+				{#if username === userData?.username}
 					{#if edit}
 						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
 					{:else}
@@ -93,7 +107,7 @@
 		</button>
 	</div>
 </TopBar>
-{#if data.data}
+{#if userData}
 	{#if edit}
 		<form
 			method="post"
@@ -134,16 +148,12 @@
 					</button>
 				</div>
 				<div class="text-xl">
-					<Input
-						placeholder="Display name"
-						value={data.data.display_name || ''}
-						name="displayname"
-					/>
-					<p class="text-light-text text-sm">@{data.data.username}</p>
+					<Input placeholder="Display name" value={userData.displayName || ''} name="displayname" />
+					<p class="text-light-text text-sm">@{userData.username}</p>
 				</div>
 			</div>
 			<div class="mt-2 mb-4">
-				<TextArea placeholder="Biography" value={data.data.bio} name="bio" />
+				<TextArea placeholder="Biography" value={userData.bio} name="bio" />
 			</div>
 			<Button
 				text="Save"
@@ -167,25 +177,25 @@
 	{:else}
 		<div class="flex">
 			<img
-				src={data.data?.profile_pic || '/icon.png'}
+				src={image || '/icon.png'}
 				class="rounded-full aspect-square size-20 mr-2 object-cover"
 				alt=""
 			/>
 			<div>
-				<p class="text-text text-2xl">{data.data.display_name || ''}</p>
-				<p class="text-light-text text-sm">@{data.data.username}</p>
-				{#if data.data.username == 'luna'}
+				<p class="text-text text-2xl">{userData.displayName || ''}</p>
+				<p class="text-light-text text-sm">@{userData.username}</p>
+				{#if userData.username == 'luna'}
 					<p class="bg-red-600 opacity-70 p-0.5 rounded-md text-xs w-fit">Admin</p>
 				{/if}
 			</div>
 		</div>
-		{#if data.data.bio}
+		{#if userData.bio}
 			<p class="mt-2 bg-fg mb-1 w-full rounded-md p-1">
-				{data.data.bio}
+				{userData.bio}
 			</p>
 		{/if}
 	{/if}
-	{#if data.data.username == data.username}
+	{#if userData.username == username}
 		<Tutorial title="Completing your profile">
 			<ol>
 				<li class="flex">
@@ -215,4 +225,4 @@
 		</Tutorial>
 	{/if}
 {/if}
-<Error error={data.error || form?.error} />
+<Error error={error || form?.error} />

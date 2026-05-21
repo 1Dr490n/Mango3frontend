@@ -11,6 +11,7 @@ interface ApiParams {
 	data?: Record<string, any> | null;
 	auth?: AuthDTO;
 	cookies?: Cookies;
+	mayRedirect?: boolean;
 }
 
 export const api_url = API_URL;
@@ -35,7 +36,7 @@ async function request(method: string, params: ApiParams): Promise<ResData<any>>
 		});
 
 		if (params.auth || params.cookies) {
-			const err = checkUnauthorized(res, params.url || undefined);
+			const err = checkUnauthorized(res, params.mayRedirect ?? false, params.url || undefined);
 			if (err) {
 				return { ...err, status: 401 };
 			}
@@ -84,12 +85,15 @@ export const isApiError = (response: any) => {
 	return false;
 };
 
-const checkUnauthorized = (res: Response, url?: URL | string) => {
+const checkUnauthorized = (res: Response, mayRedirect: boolean, url?: URL | string) => {
 	if (res.status === 401) {
 		const redirectUrl = `/login/?redirect=${url || ''}`;
 		if (browser) {
 			goto(redirectUrl);
 		} else {
+			if (mayRedirect) {
+				redirect(302, redirectUrl);
+			}
 			return {
 				redirect: redirectUrl,
 				error: 'Redirecting...'

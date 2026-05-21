@@ -4,16 +4,13 @@ import type { GroupDTO, InviteDTO, ResData, UserDTO } from '../../../lib/types';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ cookies, url }) => {
-	const users: ResData<UserDTO[]> = await API.get(
-		{
-			resource: `/user`,
-			auth: true,
-			url
-		},
+	const users: ResData<UserDTO[]> = await API.get({
+		resource: `/user`,
+		url,
 		cookies
-	);
+	});
 
-	if (users.data) {
+	if (users.data && users.username) {
 		const index = users.data.findIndex((x) => x.username == users.username);
 		users.data = [...users.data.slice(0, index), ...users.data.slice(index + 1)];
 	}
@@ -29,31 +26,26 @@ export const actions: Actions = {
 		if (!name) {
 			return fail(400, { isGroup: true, nameInvalid: true });
 		}
-		const response: ResData<GroupDTO> = await API.post(
-			{
-				resource: '/group',
-				auth: true,
-				data: {
-					name
-				},
-				url
+		const response: ResData<GroupDTO> = await API.post({
+			resource: '/group',
+			data: {
+				name
 			},
+			url,
 			cookies
-		);
+		});
 		if (response.error) {
 			return fail(400, { error: response.error, isGroup: true, name });
 		}
 		redirect(302, `/group/${response.data?.id}`);
 	},
 	private: async ({ cookies, url }) => {
-		const response: ResData<InviteDTO> = await API.post(
-			{
-				resource: '/invite',
-				auth: true,
-				url
-			},
-			cookies
-		);
+		const response: ResData<InviteDTO> = await API.post({
+			resource: '/invite',
+			url,
+			cookies,
+			mayRedirect: true
+		});
 
 		if (response.error) {
 			return fail(400, { error: response.error, isGroup: false });

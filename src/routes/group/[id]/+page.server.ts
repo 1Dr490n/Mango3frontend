@@ -28,10 +28,10 @@ export const load: PageServerLoad = async ({ cookies, params, url }) => {
 
 		const messages: Promise<ResData<MessageDTO[]>>[] = [];
 		if (group.data) {
-			for (let i = 0; i < group.data.message_count; i += 1) {
+			for (let i = 0; i < group.data.message_count; i += 10) {
 				messages.push(
 					API.get({
-						resource: `/group/${params.id}/message?take=1&skip=${i}`,
+						resource: `/group/${params.id}/message?take=10&skip=${i}`,
 						url,
 						cookies
 					})
@@ -80,7 +80,7 @@ export const actions: Actions = {
 		const message = form?.get('message')?.toString() || '';
 		const item = form?.get('item')?.toString();
 
-		const response = await API.post({
+		const response: ResData<MessageDTO> = await API.post({
 			resource: `/group/${params.id}/message`,
 			data: {
 				item: item && JSON.parse(item),
@@ -94,7 +94,9 @@ export const actions: Actions = {
 			return fail(400, { error: response.error, message, item });
 		}
 
-		return {};
+		return {
+			sentMessage: response.data
+		};
 	},
 	delete: async ({ cookies, params, request, url }) => {
 		const form = await request.formData();

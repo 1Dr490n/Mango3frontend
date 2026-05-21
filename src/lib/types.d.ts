@@ -45,6 +45,7 @@ export class ItemDTO {
 	artist: string;
 	image: string;
 	href: string;
+	audio: string;
 }
 
 export class MessageDTO {

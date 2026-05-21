@@ -11,6 +11,7 @@
 	import Tutorial from '../../../lib/components/Tutorial.svelte';
 	import { browser } from '$app/environment';
 	import Loader from '../../../lib/components/Loader.svelte';
+	import { goto } from '$app/navigation';
 
 	export let data;
 	export let form;
@@ -21,19 +22,29 @@
 	let group: GroupDTO | undefined = undefined;
 	let error: string = '';
 	let messages: (MessageDTO | undefined)[] = [];
+	let username = '';
 
 	data.initial?.then((initial) => {
+		if (initial.group.redirect && browser) {
+			goto(initial.group.redirect);
+		}
 		if (!initial.group.data) {
 			error = initial.group.error || '';
 			return;
 		}
 		group = initial.group.data;
+		username = initial.group.username ?? '';
 		messages = Array(group.message_count);
 
-		for (let i = 0; i < messages.length; i++) {
+		for (let i = 0; i < initial.messages.length; i++) {
 			initial.messages[i].then((message) => {
 				if (message.data) {
-					messages[i] = message.data[0];
+					for (let j = 0; j < 10 && j < message.data.length; j++) {
+						messages[j + i * 10] = message.data[j];
+					}
+				}
+				if (message.redirect && browser) {
+					goto(message.redirect);
 				}
 				loaded++;
 			});
@@ -60,6 +71,8 @@
 			}
 		});
 	}
+
+	let loadingItems = false;
 
 	let items: ItemDTO[] = [];
 	let page = 0;
@@ -119,11 +132,13 @@
 			method="post"
 			action="?/send"
 			use:enhance={() => {
-				return async ({ update }) => {
+				return async ({ update, result }) => {
 					await update();
 					selectedItem = null;
 					items = [];
 					search = null;
+					//@ts-ignore
+					messages = [result.data.sentMessage, ...messages];
 				};
 			}}
 		>
@@ -145,9 +160,18 @@
 						items = [];
 						page = 0;
 					}
+					//@ts-ignore
 					if (result.data && result.data.data) items = items.concat(result.data.data);
+					loaded++;
+					loadingItems = false;
 					page++;
 				};
+			}}
+			on:submit={() => {
+				loadingItems = true;
+				if (search !== form?.search) {
+					items = [];
+				}
 			}}
 		>
 			<input value={page} name="page" type="hidden" class="bg-black" />
@@ -167,6 +191,9 @@
 				<Button text="Load more" type="submit" />
 			{/if}
 		</form>
+		{#if loadingItems}
+			<Loader />
+		{/if}
 	{/if}
 	{#each messages as message}
 		{#if message}
@@ -209,8 +236,18 @@
 							{/if}
 							<div class="mt-2 grid grid-cols-2">
 								<div class="mb-1 ml-2 flex"></div>
-								{#if users?.get(message.sent_by)?.username === ''}
-									<form method="post" action="?/delete" use:enhance>
+								{#if users?.get(message.sent_by)?.username === username}
+									<form
+										method="post"
+										action="?/delete"
+										use:enhance={() => {
+											return async ({ update }) => {
+												await update();
+												const index = messages.findIndex((x) => x?.id == message.id);
+												messages = [...messages.slice(0, index), ...messages.slice(index + 1)];
+											};
+										}}
+									>
 										<input type="hidden" name="message" value={expandedItem} />
 										<Button text="Delete" type="submit" />
 									</form>
@@ -223,7 +260,7 @@
 		{/if}
 	{/each}
 
-	{#if loaded < messages.length}
+	{#if loaded < group.message_count / 10}
 		<Loader />
 	{/if}
 	<Tutorial title="Using chats">

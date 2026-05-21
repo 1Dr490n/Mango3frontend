@@ -4,14 +4,13 @@ import type { GroupDTO, ResData, UserDTO } from '../../../lib/types';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, cookies, url }) => {
-	const user: ResData<UserDTO> = await API.get({
+	const user: Promise<ResData<UserDTO>> = API.get({
 		resource: `/user/${params.id}`,
-		url
+		url,
+		cookies
 	});
 
-	user.username = auth(cookies)?.username;
-
-	return user;
+	return { user };
 };
 
 export const actions: Actions = {
@@ -34,7 +33,8 @@ export const actions: Actions = {
 		const group: ResData<GroupDTO> = await API.get({
 			resource: `/group/user/${params.id}`,
 			url,
-			cookies
+			cookies,
+			mayRedirect: true
 		});
 		if (group.error) {
 			return group;
