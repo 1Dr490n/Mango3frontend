@@ -34,7 +34,7 @@ async function request(method: string, params: ApiParams): Promise<ResData<any>>
 			body: params.data && JSON.stringify(params.data)
 		});
 
-		if (auth) checkUnauthorized(res, params.url || undefined);
+		if (params.auth || params.cookies) checkUnauthorized(res, params.url || undefined);
 		if (res.status == 500) {
 			return { error: 'Internal server error', status: 500 };
 		}
