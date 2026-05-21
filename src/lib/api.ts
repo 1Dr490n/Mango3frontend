@@ -80,13 +80,15 @@ export const isApiError = (response: any) => {
 };
 
 const checkUnauthorized = (res: Response, url?: URL | string) => {
-	console.log(res.status);
 	if (res.status === 401) {
 		const redirectUrl = `/login/?redirect=${url || ''}`;
 		if (browser) {
 			goto(redirectUrl);
 		} else {
-			redirect(302, redirectUrl);
+			return {
+				redirect: redirectUrl,
+				error: 'Invalid credentials'
+			};
 		}
 	}
 };
