@@ -5,26 +5,22 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
 export const load: PageServerLoad = async ({ cookies, params, url }) => {
-	const invite: ResData<InviteDTO> = await API.get(
-		{
-			resource: `/invite/${params.id}`,
-			url
-		},
+	const invite: ResData<InviteDTO> = await API.get({
+		resource: `/invite/${params.id}`,
+		url,
 		cookies
-	);
+	});
 
 	return invite;
 };
 export const actions: Actions = {
 	default: async ({ params, cookies, url }) => {
-		const response: ResData<GroupDTO> = await API.post(
-			{
-				resource: `/invite/${params.id}`,
-				auth: true,
-				url
-			},
-			cookies
-		);
+		const response: ResData<GroupDTO> = await API.post({
+			resource: `/invite/${params.id}`,
+			url,
+			cookies,
+			mayRedirect: true
+		});
 
 		if (response.error) {
 			return fail(400, { error: response.error });

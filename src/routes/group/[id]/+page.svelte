@@ -234,6 +234,7 @@
 									{@html message.message}
 								</p>
 							{/if}
+							{message.item.audio}
 							<div class="mt-2 grid grid-cols-2">
 								<div class="mb-1 ml-2 flex"></div>
 								{#if users?.get(message.sent_by)?.username === username}

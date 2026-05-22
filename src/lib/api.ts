@@ -96,7 +96,7 @@ const checkUnauthorized = (res: Response, mayRedirect: boolean, url?: URL | stri
 			}
 			return {
 				redirect: redirectUrl,
-				error: 'Redirecting...'
+				error: 'Please log out.'
 			};
 		}
 	}

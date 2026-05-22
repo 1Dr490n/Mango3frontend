@@ -2,7 +2,6 @@
 	import Button from '../../../lib/components/Button.svelte';
 	import Error from '../../../lib/components/Error.svelte';
 	import TopBar from '../../../lib/components/TopBar.svelte';
-	import User from '../../../lib/components/User.svelte';
 	import type { InviteDTO } from '../../../lib/types';
 	import { enhance } from '$app/forms';
 
