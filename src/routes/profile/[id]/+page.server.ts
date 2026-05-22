@@ -19,10 +19,11 @@ export const actions: Actions = {
 
 		const displayName = form.get('displayname')?.toString() || '';
 		const bio = form.get('bio')?.toString() || '';
+		const image = form.get('image')?.toString() || '';
 
 		const response = await API.put({
 			resource: '/user',
-			data: { display_name: displayName, bio, profile_pic: true },
+			data: { display_name: displayName, bio, profile_pic: image },
 			url,
 			cookies
 		});

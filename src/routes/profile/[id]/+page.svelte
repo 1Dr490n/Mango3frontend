@@ -155,6 +155,7 @@
 			<div class="mt-2 mb-4">
 				<TextArea placeholder="Biography" value={userData.bio} name="bio" />
 			</div>
+			<input hidden value={image} name="image" />
 			<Button
 				text="Save"
 				color="bg-confirm"
