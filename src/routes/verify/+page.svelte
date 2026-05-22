@@ -1,9 +1,16 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
 	import Error from '../../lib/components/Error.svelte';
 	import Loader from '../../lib/components/Loader.svelte';
 	import TopBar from '../../lib/components/TopBar.svelte';
 
 	export let data;
+	data.response.then((x) => {
+		if (x.redirect && browser) {
+			goto(x.redirect);
+		}
+	});
 </script>
 
 <TopBar />
