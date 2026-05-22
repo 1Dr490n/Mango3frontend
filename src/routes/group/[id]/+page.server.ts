@@ -58,13 +58,18 @@ export const actions: Actions = {
 
 		const search = form.get('search')?.toString()?.trim();
 		const page = +(form.get('page') || 0);
+		let type = new Map<string, string>([
+			['Song', 'track'],
+			['Artist', 'artist'],
+			['Album', 'album']
+		]).get(form.get('type')?.toString() ?? '');
 
 		if (!search) {
 			return fail(400, { searchInvalid: true, page });
 		}
 
 		const response: ResData<ItemDTO[]> = await API.get({
-			resource: `/search?q=${search}&page=${page}`,
+			resource: `/search?q=${search}&page=${page}&type=${type}`,
 			url
 		});
 

@@ -25,7 +25,9 @@
 		<a href={item.href}>
 			<img
 				src={item.image || '/icon.png'}
-				class="mr-2 w-12 min-w-12 aspect-square rounded-lg"
+				class="mr-2 w-12 min-w-12 aspect-square {item.type == 'artist'
+					? 'rounded-full'
+					: 'rounded-lg'}"
 				alt=""
 			/>
 		</a>

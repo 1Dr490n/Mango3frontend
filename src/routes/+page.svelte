@@ -82,6 +82,11 @@
 {#await data.response}
 	<Loader />
 {:then awaited}
+	{#if !awaited.count.data?.has_mail}
+		<p class="mb-4 opacity-80 bg-red-700 p-2 rounded-xl text-sm">
+			You haven't registered an e-mail yet! Do so in the settings to receive notifications.
+		</p>
+	{/if}
 	{#each awaited.groups || [] as groupsPromise}
 		{#await groupsPromise then groups}
 			{#if groups.data}

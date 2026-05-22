@@ -89,7 +89,7 @@
 </script>
 
 <TopBar>
-	{#if group?.name}
+	{#if !group?.is_private}
 		<form class="justify-start flex" method="post" action="?/invite" use:enhance>
 			<button
 				class="active:bg-fg flex justify-center items-center p-3 ml-1 rounded-full transition-colors aspect-square"
@@ -175,15 +175,25 @@
 			}}
 		>
 			<input value={page} name="page" type="hidden" class="bg-black" />
-			<Input
-				bind:value={search}
-				placeholder="Search..."
-				name="search"
-				error={searchInvalid && 'Must not be empty'}
-				onchange={() => {
-					page = 0;
-				}}
-			/>
+
+			<div class="flex">
+				<div class="w-full">
+					<Input
+						bind:value={search}
+						placeholder="Search..."
+						name="search"
+						error={searchInvalid && 'Must not be empty'}
+						onchange={() => {
+							page = 0;
+						}}
+					/>
+				</div>
+				<select class="mb-1 ml-1 w-30 rounded-md bg-fg p-1" name="type">
+					<option>Song</option>
+					<option>Album</option>
+					<option>Artist</option>
+				</select>
+			</div>
 			{#if items.length}
 				{#each items ?? [] as item}
 					<Item {item} onclick={() => (selectedItem = item)} />
@@ -234,7 +244,7 @@
 									{@html message.message}
 								</p>
 							{/if}
-							{message.item.audio}
+
 							<div class="mt-2 grid grid-cols-2">
 								<div class="mb-1 ml-2 flex"></div>
 								{#if users?.get(message.sent_by)?.username === username}
