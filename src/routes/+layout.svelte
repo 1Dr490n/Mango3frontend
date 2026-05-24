@@ -2,7 +2,6 @@
 	import { browser } from '$app/environment';
 	import { colors, themes } from '$lib/constants';
 	import type { Theme } from '$lib/types';
-	import { slide } from 'svelte/transition';
 	import '../app.css';
 
 	if (browser) {

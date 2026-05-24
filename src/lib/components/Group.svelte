@@ -13,7 +13,9 @@
 	<div
 		class="flex hover:cursor-pointer {group.is_private
 			? 'bg-pink-600'
-			: 'bg-purple-600'} rounded-full p-3 mb-2 items-center"
+			: group.id == 'public'
+				? 'bg-orange-400'
+				: 'bg-purple-600'} rounded-full p-3 mb-2 items-center"
 		on:click={() => onclick && onclick()}
 	>
 		<!-- svelte-ignore a11y-missing-attribute -->

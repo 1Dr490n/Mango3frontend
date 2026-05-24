@@ -89,7 +89,7 @@
 </script>
 
 <TopBar>
-	{#if !group?.is_private}
+	{#if !group?.is_private && group?.id != 'public'}
 		<form class="justify-start flex" method="post" action="?/invite" use:enhance>
 			<button
 				class="active:bg-fg flex justify-center items-center p-3 ml-1 rounded-full transition-colors aspect-square"
@@ -161,10 +161,13 @@
 						page = 0;
 					}
 					//@ts-ignore
-					if (result.data && result.data.data) items = items.concat(result.data.data);
+					if (result.data && result.data.data) {
+						//@ts-ignore
+						items = items.concat(result.data.data);
+						page++;
+					}
 					loaded++;
 					loadingItems = false;
-					page++;
 				};
 			}}
 			on:submit={() => {
@@ -241,7 +244,7 @@
 
 							{#if message.message}
 								<p class="bg-fg mb-2 whitespace-break-spaces rounded-md p-2">
-									{@html message.message}
+									{message.message}
 								</p>
 							{/if}
 
@@ -280,13 +283,17 @@
 		In the list of messages you've received, click on the profile picture to go to the sender's profile,
 		the message picture to go to the song on Spotify, or the rest of the message to expand it.<br />
 	</Tutorial>
-	{#if !group?.is_private}
+	{#if !group?.is_private && group?.id != 'public'}
 		<Tutorial title="Invite people">
 			You can invite people to your group by clicking on the symbol in the upper left.
 		</Tutorial>
 		<Tutorial title="Editing a group">
 			Click on the purple bar at the top to change the group's name and picture and manage its
 			members.
+		</Tutorial>
+	{:else if group?.id == 'public'}
+		<Tutorial title="Public feed">
+			This is the public feed. Messages posted here will be visible to every Mango user.
 		</Tutorial>
 	{/if}
 {:else}
