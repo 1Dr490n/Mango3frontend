@@ -52,5 +52,10 @@
 		</p>
 	{/if}
 	<Button type="submit" text={mail ? 'Register' : 'Unsubscribe'} color="bg-confirm" />
+
+	<p class="text-xs mt-4">
+		Alternatively you can ask the admin to help you install pushover to receive notifications
+		directly to your phone.
+	</p>
 </form>
 <Error error={form?.error} />
