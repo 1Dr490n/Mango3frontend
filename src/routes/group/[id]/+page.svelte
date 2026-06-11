@@ -144,7 +144,7 @@
 		>
 			<input type="hidden" value={JSON.stringify(selectedItem)} name="item" />
 			<Input value="" placeholder="Message" name="message" />
-			<div class="mt-2">
+			<div class="mt-2 mb-2">
 				<Button type="submit" text="Send" color="bg-confirm" />
 			</div>
 		</form>
@@ -191,6 +191,7 @@
 						}}
 					/>
 				</div>
+				<input type="submit" class="bg-fg mb-1 w-30 rounded-md p-2 ml-1" />
 				<select class="mb-1 ml-1 w-30 rounded-md bg-fg p-1" name="type">
 					<option>Song</option>
 					<option>Album</option>
@@ -201,7 +202,9 @@
 				{#each items ?? [] as item}
 					<Item {item} onclick={() => (selectedItem = item)} />
 				{/each}
-				<Button text="Load more" type="submit" />
+				<div class="mb-1">
+					<Button text="Load more" type="submit" />
+				</div>
 			{/if}
 		</form>
 		{#if loadingItems}
